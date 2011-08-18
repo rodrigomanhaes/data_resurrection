@@ -8,6 +8,7 @@ describe 'DBF data resurrection' do
   end
 
   before :each do
+    create_test_database
     @data_resurrection = DataResurrection::Resuscitator.new(:dbf,
       test_database_settings)
   end
@@ -24,21 +25,18 @@ describe 'DBF data resurrection' do
     end
   end
 
-  context 'creating target table' do
+  context 'feeding target table' do
     before(:each) do
-      data = @data_resurrection.get_data(@dbf_file_path, :win1252..:utf8)
-      create_test_database
-      @data_resurrection.create_table('nationality', data)
-      @data_resurrection.copy_data('nationality', data)
-      ActiveRecord::Base.establish_connection(test_database_settings)
-      class Nationality < ActiveRecord::Base
-        self.table_name = 'nationality'
-      end
+      @data_resurrection.resurrect(@dbf_file_path, :target => 'nationality',
+        :encodings => :win1252..:utf8)
     end
 
     it 'creates table' do
-      nationality = Nationality.new
-      SAMPLE_FIELDS[0].each_key {|field| nationality.should respond_to field }
+      expect {
+        class Nationality < ActiveRecord::Base
+          self.table_name = 'nationality'
+        end
+      }.to_not raise_error
     end
 
     it 'copies data' do
