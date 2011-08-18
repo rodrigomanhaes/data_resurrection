@@ -2,3 +2,22 @@
 
 Bring your data, buried in decrepit formats, back to life! Convert data from old formats to modern ones. Currently supports DBF.
 
+== How to use
+
+If you have a PostgreSQL database and a DBF file called 'decrepit.dbf', you must call:
+
+    r = DataResurrection::Resuscitator.new(:dbf, :postgresql => :settings)
+    r.resurrect('decrepit.dbf', :target => 'new_beautiful_table',
+      :encodings => 'WINDOWS-1252'..'UTF-8')
+
+and you will have a table called 'new_beautiful_table' in your PostgreSQL database.
+
+The hash parameter to constructor should be the your database settings for ActiveRecord (i.e., those definitions within config/database.yml in a Rails application).
+
+The method "resurrect" accepts ":target" and ":encodings" as options. Target is the name of the table to be created in the pointed database, and encodings (optional) forces a encoding conversion for all fields.
+
+
+== Risk disclaimer
+
+This project is at a very early stage. Database migrations are a very critical issue. Anything you do with this software is at your own risk.
+
