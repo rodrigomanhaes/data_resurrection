@@ -4,7 +4,7 @@ require 'spec_helper'
 
 describe 'DBF data resurrection' do
   before :all do
-    @dbf_file_path = File.expand_path(File.join(File.dirname(__FILE__), 'resources', 'nacionalidade.dbf'))
+    @dbf_file_path = File.expand_path(File.join(File.dirname(__FILE__), 'resources', 'nationality.dbf'))
   end
 
   before :each do
@@ -28,22 +28,22 @@ describe 'DBF data resurrection' do
     before(:each) do
       data = @data_resurrection.get_data(@dbf_file_path, :win1252..:utf8)
       create_test_database
-      @data_resurrection.create_table('nacionalidade', data)
-      @data_resurrection.copy_data('nacionalidade', data)
+      @data_resurrection.create_table('nationality', data)
+      @data_resurrection.copy_data('nationality', data)
       ActiveRecord::Base.establish_connection(test_database_settings)
-      class Nacionalidade < ActiveRecord::Base
-        self.table_name = 'nacionalidade'
+      class Nationality < ActiveRecord::Base
+        self.table_name = 'nationality'
       end
     end
 
     it 'creates table' do
-      nacionalidade = Nacionalidade.new
-      SAMPLE_FIELDS[0].each_key {|field| nacionalidade.should respond_to field }
+      nationality = Nationality.new
+      SAMPLE_FIELDS[0].each_key {|field| nationality.should respond_to field }
     end
 
     it 'copies data' do
-      Nacionalidade.count.should == 2
-      Nacionalidade.all.each_with_index do |record, i|
+      Nationality.count.should == 2
+      Nationality.all.each_with_index do |record, i|
         SAMPLE_FIELDS[i].each do |field_name, value|
           record.send(field_name).should == value.to_s
         end
