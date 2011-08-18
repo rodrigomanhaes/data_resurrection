@@ -12,8 +12,6 @@ module DataResurrection
 
       private
 
-      ENCODINGS = {:utf8 => 'UTF-8', :win1252 => 'WINDOWS-1252'}
-
       def get_raw_data(table_name, sql_reserved_words)
         table = ::DBF::Table.new(table_name)
         table.map do |record|
@@ -23,7 +21,7 @@ module DataResurrection
       end
 
       def handle_encodings(data, encodings)
-        ic = Iconv.new(ENCODINGS[encodings.end], ENCODINGS[encodings.begin])
+        ic = Iconv.new(encodings.end, encodings.begin)
         data.each do |record|
           record.each do |k, v|
             record[k] = ic.iconv(v) if v.kind_of?(String)

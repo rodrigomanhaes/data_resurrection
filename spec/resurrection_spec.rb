@@ -21,7 +21,7 @@ describe 'DBF data resurrection' do
     end
 
     it "converts encodings" do
-      result = @data_resurrection.get_data(@dbf_file_path, :win1252..:utf8)
+      result = @data_resurrection.get_data(@dbf_file_path, 'WINDOWS-1252'..'UTF-8')
       result[1].should == SAMPLE_FIELDS[1]
     end
 
@@ -30,7 +30,7 @@ describe 'DBF data resurrection' do
       begin
         data_resurrection = DataResurrection::Resuscitator.new(:dbf,
           test_database_settings)
-        result = data_resurrection.get_data(@dbf_file_path, :win1252..:utf8,
+        result = data_resurrection.get_data(@dbf_file_path, 'WINDOWS-1252'..'UTF-8',
           data_resurrection.send(:sql_reserved_words))
         [0, 1].each do |n|
           result[n].should have_key 'nr_'
@@ -45,7 +45,7 @@ describe 'DBF data resurrection' do
   context 'feeding target table' do
     before(:each) do
       @data_resurrection.resurrect(@dbf_file_path, :target => 'nationality',
-        :encodings => :win1252..:utf8)
+        :encodings => 'WINDOWS-1252'..'UTF-8')
     end
 
     it 'creates table' do
