@@ -8,7 +8,8 @@ describe 'DBF data resurrection' do
   end
 
   before :each do
-    @data_resurrection = DataResurrection::Resuscitator.new(:dbf, :active_record => :data_settings)
+    @data_resurrection = DataResurrection::Resuscitator.new(:dbf,
+      test_database_settings)
   end
 
   context 'data acquiring' do
@@ -20,6 +21,20 @@ describe 'DBF data resurrection' do
     it "converts encodings" do
       result = @data_resurrection.get_data(@dbf_file_path, :win1252..:utf8)
       result[1].should == SAMPLE_FIELDS[1]
+    end
+  end
+
+  context 'creating target table' do
+    it 'creates table' do
+      data = @data_resurrection.get_data(@dbf_file_path, :win1252..:utf8)
+      create_test_database
+      @data_resurrection.create_table('nacionalidade', data)
+      ActiveRecord::Base.establish_connection(test_database_settings)
+      class Nacionalidade < ActiveRecord::Base
+        self.table_name = 'nacionalidade'
+      end
+      nacionalidade = Nacionalidade.new
+      SAMPLE_FIELDS[0].each_key {|field| nacionalidade.should respond_to field }
     end
   end
 end
