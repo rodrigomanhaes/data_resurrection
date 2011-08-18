@@ -1,6 +1,7 @@
 # coding: utf-8
 
 require 'spec_helper'
+require 'dbf'
 
 describe 'DBF data resurrection' do
   before :all do
@@ -22,6 +23,22 @@ describe 'DBF data resurrection' do
     it "converts encodings" do
       result = @data_resurrection.get_data(@dbf_file_path, :win1252..:utf8)
       result[1].should == SAMPLE_FIELDS[1]
+    end
+
+    it 'appends an underscore for fields named equal to SQL reserved words' do
+      change_reserved_words 'NR'
+      begin
+        data_resurrection = DataResurrection::Resuscitator.new(:dbf,
+          test_database_settings)
+        result = data_resurrection.get_data(@dbf_file_path, :win1252..:utf8,
+          data_resurrection.send(:sql_reserved_words))
+        [0, 1].each do |n|
+          result[n].should have_key 'nr_'
+          result[n].should_not have_key 'nr'
+        end
+      ensure
+        restore_reserved_words
+      end
     end
   end
 
