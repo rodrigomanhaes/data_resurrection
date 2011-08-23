@@ -15,7 +15,10 @@ module DataResurrection
       def get_raw_data(table_name, sql_reserved_words)
         table = ::DBF::Table.new(table_name)
         table.map do |record|
-          table.columns.map {|c| { generated_field_name(c.name.downcase, sql_reserved_words) => record.send(c.name.downcase) }}.
+          table.columns.map {|c|
+            { generated_field_name(c.name.downcase, sql_reserved_words) => record.send(c.name.downcase) } if record
+          }.
+            compact.
             reduce({}) {|h, e| h.merge! e }
         end
       end

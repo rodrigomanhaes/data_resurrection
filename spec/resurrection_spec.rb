@@ -40,6 +40,17 @@ describe 'DBF data resurrection' do
         restore_reserved_words
       end
     end
+
+    it 'ignores deleted (nil) record' do
+      # TODO: include a deleted record to test DBF to replace all these stubs
+      DBF::Table.stub(:new).and_return(table_stub = stub)
+      table_stub.stub(:map).and_yield(nil)
+      table_stub.stub(:columns).and_return(columns_stub = stub)
+      columns_stub.stub(:map).and_yield(stub :name => 'a_method').and_return([nil])
+      expect {
+        @data_resurrection.get_data(@dbf_file_path, 'WINDOWS-1252'..'UTF-8')
+      }.to_not raise_error
+    end
   end
 
   context 'feeding target table' do
