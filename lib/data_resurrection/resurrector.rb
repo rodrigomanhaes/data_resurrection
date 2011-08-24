@@ -7,8 +7,8 @@ module DataResurrection
     end
 
     def resurrect(origin_table, options)
-      target_table_name, encodings = options[:target], options[:encodings]
-      data = get_data(origin_table, encodings, sql_reserved_words)
+      target_table_name, from, to = options[:target], options[:from], options[:to]
+      data = get_data(origin_table, {from: from, to: to}, sql_reserved_words)
       create_table(target_table_name, data)
       copy_data(target_table_name, data)
     end

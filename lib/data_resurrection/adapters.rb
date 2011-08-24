@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'dbf'
 require 'iconv'
 
@@ -24,17 +26,41 @@ module DataResurrection
       end
 
       def handle_encodings(data, encodings)
-        ic = Iconv.new(encodings.end, encodings.begin)
+        from = encodings[:from].clone
+        from = [from] unless from.kind_of? Array
+        original_from = from.clone
+        to = encodings[:to]
         data.each do |record|
           record.each do |k, v|
-            record[k] = ic.iconv(v) if v.kind_of?(String)
+            from = original_from.clone
+            ic = Iconv.new(to, from.shift)
+            if v.kind_of?(String)
+              value = ic.iconv(v)
+              while !all_valid?(value) && !from.empty?
+                ic = Iconv.new(to, from.shift)
+                value = ic.iconv(v) if v.kind_of?(String)
+              end
+            else
+              value = v
+            end
+            record[k] = value
           end
         end
+      end
+
+      def all_valid?(string)
+        string.chars.all? {|c| VALID_CHARS.include? c }
       end
 
       def generated_field_name(field_name, reserved_words)
         reserved_words.include?(field_name.upcase) ? "#{field_name}_" : field_name
       end
+
+      REGULAR_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+      DIGITS = '1234567890'
+      ACCENTED_LETTERS = 'ÀàÁÉÍÓÚáéíóúÂÊÔâêôÃÑÕãñõÖÜöü'
+      SYMBOLS = "\"'!@#$\%&*()-_+=`{}[]^~,<>.:;/?|\\ "
+      VALID_CHARS = [REGULAR_LETTERS, DIGITS, ACCENTED_LETTERS, SYMBOLS].join
     end
   end
 end

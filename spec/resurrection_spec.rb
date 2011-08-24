@@ -5,7 +5,7 @@ require 'dbf'
 
 describe 'DBF data resurrection' do
   before :all do
-    @dbf_file_path = File.expand_path(File.join(File.dirname(__FILE__), 'resources', 'nationality.dbf'))
+    @dbf_file_path = File.expand_path(File.join(File.dirname(__FILE__), 'resources', 'nationality-3.dbf'))
   end
 
   before :each do
@@ -21,8 +21,16 @@ describe 'DBF data resurrection' do
     end
 
     it "converts encodings" do
-      result = @data_resurrection.get_data(@dbf_file_path, 'WINDOWS-1252'..'UTF-8')
+      result = @data_resurrection.get_data(@dbf_file_path,
+        :from => 'WINDOWS-1252', :to => 'UTF-8')
       result[1].should == SAMPLE_FIELDS[1]
+    end
+
+    it 'supports multiple encodings for the same table (yes, this kind of freaky thing really exist)' do
+      result = @data_resurrection.get_data(@dbf_file_path, :from => 'WINDOWS-1252', :to => 'UTF-8')
+      result[2].should_not == SAMPLE_FIELDS[2]
+      result = @data_resurrection.get_data(@dbf_file_path, :from => ['WINDOWS-1252', 'CP850'], :to => 'UTF-8')
+      result[2].should == SAMPLE_FIELDS[2]
     end
 
     it 'appends an underscore for fields named equal to SQL reserved words' do
@@ -30,7 +38,7 @@ describe 'DBF data resurrection' do
       begin
         data_resurrection = DataResurrection::Resuscitator.new(:dbf,
           test_database_settings)
-        result = data_resurrection.get_data(@dbf_file_path, 'WINDOWS-1252'..'UTF-8',
+        result = data_resurrection.get_data(@dbf_file_path, { :from => 'WINDOWS-1252', :to => 'UTF-8' },
           data_resurrection.send(:sql_reserved_words))
         [0, 1].each do |n|
           result[n].should have_key 'nr_'
@@ -43,7 +51,7 @@ describe 'DBF data resurrection' do
 
     it 'ignores deleted (nil) record' do
       expect {
-        @data_resurrection.get_data(@dbf_file_path, 'WINDOWS-1252'..'UTF-8')
+        @data_resurrection.get_data(@dbf_file_path, :from => 'WINDOWS-1252', :to => 'UTF-8')
       }.to_not raise_error
     end
   end
@@ -51,7 +59,7 @@ describe 'DBF data resurrection' do
   context 'feeding target table' do
     before(:each) do
       @data_resurrection.resurrect(@dbf_file_path, :target => 'nationality',
-        :encodings => 'WINDOWS-1252'..'UTF-8')
+        :from => ['WINDOWS-1252', 'CP850'], :to => 'UTF-8')
     end
 
     it 'creates table' do
@@ -63,10 +71,11 @@ describe 'DBF data resurrection' do
     end
 
     it 'copies data' do
-      Nationality.count.should == 2
+      Nationality.count.should == 3
       Nationality.all.each_with_index do |record, i|
         SAMPLE_FIELDS[i].each do |field_name, value|
-          record.send(field_name).should == value.to_s
+          f = record.send(field_name)
+          f.should == value.to_s
         end
       end
     end
@@ -85,6 +94,12 @@ SAMPLE_FIELDS = [
     'ds' => 'ESTADOS UNIDOS DA AMÉRICA',
     'ad_patr' => 'AMERICANO',
     'cd_nac' => 36
+  },
+  {
+    'nr' => 6,
+    'ds' => 'MOÇAMBIQUE',
+    'ad_patr' => 'MOÇAMBICANO',
+    'cd_nac' => 38
   }
 ]
 
