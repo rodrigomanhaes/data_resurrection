@@ -8,13 +8,13 @@ If you have a PostgreSQL database and a DBF file called 'decrepit.dbf', you must
 
     r = DataResurrection::Resuscitator.new(:dbf, :postgresql => :settings)
     r.resurrect('decrepit.dbf', :target => 'new_beautiful_table',
-      :encodings => 'WINDOWS-1252'..'UTF-8')
+      :from => 'WINDOWS-1252', :to => 'UTF-8')
 
 and you will have a table called 'new_beautiful_table' in your PostgreSQL database.
 
 The hash parameter to constructor should be the your database settings for ActiveRecord (i.e., those definitions within config/database.yml in a Rails application).
 
-The method "resurrect" accepts ":target" and ":encodings" as options. Target is the name of the table to be created in the pointed database, and encodings (optional) forces a encoding conversion for all fields.
+The method "resurrect" accepts ":target", ":from" and ":to" as options. Target is the name of the table to be created in the pointed database, and :from and :to (both optional) forces a encoding conversion for all fields. Parameter :from may be a list in case of multiple encodings for the same table (yes, this kind of freaky thing really exists).
 
 
 == Risk disclaimer
