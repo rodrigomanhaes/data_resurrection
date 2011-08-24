@@ -54,6 +54,22 @@ describe 'DBF data resurrection' do
         @data_resurrection.get_data(@dbf_file_path, :from => 'WINDOWS-1252', :to => 'UTF-8')
       }.to_not raise_error
     end
+
+    context 'when receiving an Iconv::IllegalSequence' do
+      class MyIllegalSequence < Iconv::IllegalSequence
+        def initialize
+        end
+      end
+
+      it 'applies next encoding if exists' do
+        @data_resurrection.stub(:get_raw_data).and_return([{'a' => 'b'}])
+        Iconv.should_receive(:new).once.with('UTF-8', 'WINDOWS-1252').and_return(iconv = stub)
+        iconv.stub(:iconv).and_raise(MyIllegalSequence)
+        Iconv.should_receive(:new).once.with('UTF-8', 'CP860').and_return(
+          stub(:iconv => 'a'))
+        @data_resurrection.get_data(@dbf_file_path, :from => ['WINDOWS-1252', 'CP860'], :to => 'UTF-8')
+      end
+    end
   end
 
   context 'feeding target table' do

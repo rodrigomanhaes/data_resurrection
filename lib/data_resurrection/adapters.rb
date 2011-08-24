@@ -34,9 +34,12 @@ module DataResurrection
             if v.kind_of?(String)
               value = v
               from.each do |encoding|
-                ic = Iconv.new(to, encoding)
-                value = ic.iconv(v) if v.kind_of?(String)
-                break if all_valid?(value)
+                begin
+                  ic = Iconv.new(to, encoding)
+                  value = ic.iconv(v) if v.kind_of?(String)
+                  break if all_valid?(value)
+                rescue Iconv::IllegalSequence
+                end
               end
               record[k] = value
             end
