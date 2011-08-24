@@ -5,7 +5,7 @@ require 'dbf'
 
 describe 'DBF data resurrection' do
   before :all do
-    @dbf_file_path = File.expand_path(File.join(File.dirname(__FILE__), 'resources', 'nationality-3.dbf'))
+    @dbf_file_path = File.expand_path(File.join(File.dirname(__FILE__), 'resources', 'nationality.dbf'))
   end
 
   before :each do
