@@ -39,6 +39,7 @@ module DataResurrection
                   value = ic.iconv(v) if v.kind_of?(String)
                   break if all_valid?(value)
                 rescue Iconv::IllegalSequence
+                  raise if encoding == from.last
                 end
               end
               record[k] = value
