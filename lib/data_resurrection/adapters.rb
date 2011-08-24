@@ -26,24 +26,20 @@ module DataResurrection
       end
 
       def handle_encodings(data, encodings)
-        from = encodings[:from].clone
+        from = encodings[:from].clone || []
         from = [from] unless from.kind_of? Array
-        original_from = from.clone
         to = encodings[:to]
         data.each do |record|
           record.each do |k, v|
-            from = original_from.clone
-            ic = Iconv.new(to, from.shift)
             if v.kind_of?(String)
-              value = ic.iconv(v)
-              while !all_valid?(value) && !from.empty?
-                ic = Iconv.new(to, from.shift)
-                value = ic.iconv(v) if v.kind_of?(String)
-              end
-            else
               value = v
+              from.each do |encoding|
+                ic = Iconv.new(to, encoding)
+                value = ic.iconv(v) if v.kind_of?(String)
+                break if all_valid?(value)
+              end
+              record[k] = value
             end
-            record[k] = value
           end
         end
       end
