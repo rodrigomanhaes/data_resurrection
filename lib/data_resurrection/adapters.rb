@@ -33,8 +33,11 @@ module DataResurrection
       end
 
       def copy_data(table_name, data)
-        cls = Class.new(ActiveRecord::Base) { self.table_name = table_name }
-        data.each {|record| cls.create! record }
+        ARObject.instance_eval do
+          self.table_name = table_name
+          reset_column_information
+        end
+        data.each {|record| ARObject.create! record }
       end
 
       def get_raw_data(table, reserved_words)
@@ -76,6 +79,9 @@ module DataResurrection
 
       def generated_field_name(field_name, reserved_words)
         reserved_words.include?(field_name.upcase) ? "#{field_name}_" : field_name
+      end
+
+      class ARObject < ActiveRecord::Base
       end
 
       REGULAR_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
