@@ -6,16 +6,38 @@ require 'iconv'
 module DataResurrection
   module Adapters
     module DBF
-      def get_data(table_name, encodings=nil, sql_reserved_words=[])
-        result = get_raw_data(table_name, sql_reserved_words)
+      def resurrect(origin_table, options)
+        target_table_name, from, to = options[:target], options[:from], options[:to]
+        table = ::DBF::Table.new(origin_table)
+        data = get_data(table, {from: from, to: to}, sql_reserved_words)
+        create_table(table, target_table_name, data)
+        copy_data(target_table_name, data)
+      end
+
+      def get_data(table, encodings=nil, sql_reserved_words=[])
+        result = get_raw_data(table, sql_reserved_words)
         result = handle_encodings(result, encodings) if encodings
         result
       end
 
       private
 
-      def get_raw_data(table_name, sql_reserved_words)
-        table = ::DBF::Table.new(table_name)
+      def create_table(table, table_name, data)
+        eval(table.schema)
+      end
+
+      def copy_data(table_name, data)
+        data.each do |record|
+          keys = record.keys
+          @connection.execute <<-SQL
+            INSERT INTO #{table_name}
+              (#{keys.join(',')})
+              VALUES (#{keys.map {|k| "'" + record[k].to_s + "'" }.join(',')})
+          SQL
+        end
+      end
+
+      def get_raw_data(table, sql_reserved_words)
         result = table.map {|record|
           table.columns.map {|c|
             { generated_field_name(c.name.downcase, sql_reserved_words) => record.send(c.name.downcase) } if record
