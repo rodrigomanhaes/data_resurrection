@@ -43,7 +43,7 @@ module DataResurrection
       def get_raw_data(table, reserved_words)
         result = table.map {|record|
           table.columns.map {|c|
-            { generated_field_name(c.name.downcase, reserved_words) => record.send(c.name.downcase) } if record
+            { generated_field_name(c.name.downcase, reserved_words) => record.attributes[c.name.downcase] } if record
           }.
             compact.
             reduce({}) {|h, e| h.merge! e }

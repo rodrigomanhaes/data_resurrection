@@ -64,6 +64,12 @@ describe 'DBF data resurrection' do
         }.to raise_error(Iconv::IllegalSequence)
       end
     end
+
+    it 'handles name conflicts between field names and Ruby methods' do
+      Kernel.module_eval { def nr; Class; end }
+      result = @data_resurrection.get_data(@dbf_table, :from => 'WINDOWS-1252', :to => 'UTF-8')
+      (0..2).each {|n| result[n]['nr'].should == SAMPLE_FIELDS[n]['nr'] }
+    end
   end
 
   context 'feeding target table' do
@@ -85,7 +91,7 @@ describe 'DBF data resurrection' do
       Nationality.count.should == 3
       Nationality.all.each_with_index do |record, i|
         SAMPLE_FIELDS[i].each do |field_name, value|
-          f = record.send(field_name)
+          f = record.attributes[field_name]
           f.should == value
         end
       end
