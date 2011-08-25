@@ -99,7 +99,7 @@ describe 'DBF data resurrection' do
   end
 
   context 'handles SQL reserved words appending an underscore' do
-    before(:all) { change_reserved_words 'NR' }
+    before(:all) { change_reserved_words "NR\nANYTHING" }
     after(:all) { restore_reserved_words }
 
     before :each do

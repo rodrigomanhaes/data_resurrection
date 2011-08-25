@@ -14,7 +14,7 @@ module DataResurrection
 
     def reserved_words
       @reserved_words ||= File.read(File.expand_path(File.join(File.dirname(__FILE__), 'reserved_words'))).
-        each_line.to_a
+        each_line.map(&:chomp)
     end
   end
 end
