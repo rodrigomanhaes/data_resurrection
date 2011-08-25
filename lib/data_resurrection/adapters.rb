@@ -23,18 +23,18 @@ module DataResurrection
       private
 
       def create_table(table, table_name, data)
-        eval(table.schema)
+        schema = table.schema
+        data.first.keys.each do |field|
+          if !schema.include?('column "%s"' % field)
+            schema['column "%s"' % field.chop] = 'column "%s"' % field
+          end
+        end
+        eval(schema)
       end
 
       def copy_data(table_name, data)
-        data.each do |record|
-          keys = record.keys
-          @connection.execute <<-SQL
-            INSERT INTO #{table_name}
-              (#{keys.join(',')})
-              VALUES (#{keys.map {|k| "'" + record[k].to_s + "'" }.join(',')})
-          SQL
-        end
+        cls = Class.new(ActiveRecord::Base) { self.table_name = table_name }
+        data.each {|record| cls.create! record }
       end
 
       def get_raw_data(table, sql_reserved_words)

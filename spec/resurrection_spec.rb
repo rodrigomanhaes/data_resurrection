@@ -102,15 +102,23 @@ describe 'DBF data resurrection' do
     before(:all) { change_reserved_words 'NR' }
     after(:all) { restore_reserved_words }
 
-    it 'on data retrieving' do
-      data_resurrection = DataResurrection::Resuscitator.new(:dbf,
+    before :each do
+      @data_resurrection = DataResurrection::Resuscitator.new(:dbf,
         test_database_settings)
-      result = data_resurrection.get_data(@dbf_table, { :from => 'WINDOWS-1252', :to => 'UTF-8' },
-        data_resurrection.send(:sql_reserved_words))
+    end
+
+    it 'on data retrieving' do
+      result = @data_resurrection.get_data(@dbf_table, { :from => 'WINDOWS-1252', :to => 'UTF-8' },
+        @data_resurrection.send(:sql_reserved_words))
       [0, 1].each do |n|
         result[n].should have_key 'nr_'
         result[n].should_not have_key 'nr'
       end
+    end
+
+    it 'on table creation' do
+      @data_resurrection.resurrect(@dbf_file_path, :target => 'nationality', :from => 'WINDOWS-1252', :to => 'UTF-8')
+      Class.new(ActiveRecord::Base) { self.table_name = 'nationality' }.new.should respond_to('nr_')
     end
   end
 end
