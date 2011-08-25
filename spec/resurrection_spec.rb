@@ -1,6 +1,7 @@
 # coding: utf-8
 
 require 'spec_helper'
+require 'logger'
 require 'dbf'
 
 describe 'DBF data resurrection' do
@@ -11,8 +12,7 @@ describe 'DBF data resurrection' do
 
   before :each do
     create_test_database
-    @data_resurrection = DataResurrection::Resuscitator.new(:dbf,
-      test_database_settings)
+    @data_resurrection = DataResurrection::Resuscitator.new(:dbf, test_database_settings)
   end
 
   context 'data acquiring' do
@@ -84,6 +84,7 @@ describe 'DBF data resurrection' do
 
   context 'feeding target table' do
     before(:each) do
+      ActiveRecord::Migration.verbose = false
       @data_resurrection.resurrect(@dbf_file_path, :target => 'nationality',
         :from => ['WINDOWS-1252', 'CP850'], :to => 'UTF-8')
     end
