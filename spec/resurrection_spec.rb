@@ -34,22 +34,6 @@ describe 'DBF data resurrection' do
       result[2].should == SAMPLE_FIELDS[2]
     end
 
-    it 'appends an underscore for fields named equal to SQL reserved words' do
-      change_reserved_words 'NR'
-      begin
-        data_resurrection = DataResurrection::Resuscitator.new(:dbf,
-          test_database_settings)
-        result = data_resurrection.get_data(@dbf_table, { :from => 'WINDOWS-1252', :to => 'UTF-8' },
-          data_resurrection.send(:sql_reserved_words))
-        [0, 1].each do |n|
-          result[n].should have_key 'nr_'
-          result[n].should_not have_key 'nr'
-        end
-      ensure
-        restore_reserved_words
-      end
-    end
-
     it 'ignores deleted (nil) record' do
       expect {
         @data_resurrection.get_data(@dbf_table, :from => 'WINDOWS-1252', :to => 'UTF-8')
@@ -111,6 +95,22 @@ describe 'DBF data resurrection' do
       obj = Nationality.find_by_nr(6)
       obj.nr.should be_a_kind_of Integer
       obj.cd_nac.should be_a_kind_of Integer
+    end
+  end
+
+  context 'handles SQL reserved words appending an underscore' do
+    before(:all) { change_reserved_words 'NR' }
+    after(:all) { restore_reserved_words }
+
+    it 'on data retrieving' do
+      data_resurrection = DataResurrection::Resuscitator.new(:dbf,
+        test_database_settings)
+      result = data_resurrection.get_data(@dbf_table, { :from => 'WINDOWS-1252', :to => 'UTF-8' },
+        data_resurrection.send(:sql_reserved_words))
+      [0, 1].each do |n|
+        result[n].should have_key 'nr_'
+        result[n].should_not have_key 'nr'
+      end
     end
   end
 end
