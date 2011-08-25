@@ -12,8 +12,8 @@ module DataResurrection
       @adapters ||= {:dbf => DataResurrection::Adapters::DBF }
     end
 
-    def sql_reserved_words
-      @sql_reserved_words ||= File.read(File.expand_path(File.join(File.dirname(__FILE__), 'sql_reserved_words'))).
+    def reserved_words
+      @reserved_words ||= File.read(File.expand_path(File.join(File.dirname(__FILE__), 'reserved_words'))).
         each_line.to_a
     end
   end

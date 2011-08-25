@@ -109,7 +109,7 @@ describe 'DBF data resurrection' do
 
     it 'on data retrieving' do
       result = @data_resurrection.get_data(@dbf_table, { :from => 'WINDOWS-1252', :to => 'UTF-8' },
-        @data_resurrection.send(:sql_reserved_words))
+        @data_resurrection.send(:reserved_words))
       [0, 1].each do |n|
         result[n].should have_key 'nr_'
         result[n].should_not have_key 'nr'

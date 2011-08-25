@@ -9,13 +9,13 @@ module DataResurrection
       def resurrect(origin_table, options)
         target_table_name, from, to = options[:target], options[:from], options[:to]
         table = ::DBF::Table.new(origin_table)
-        data = get_data(table, {from: from, to: to}, sql_reserved_words)
+        data = get_data(table, {from: from, to: to}, reserved_words)
         create_table(table, target_table_name, data)
         copy_data(target_table_name, data)
       end
 
-      def get_data(table, encodings=nil, sql_reserved_words=[])
-        result = get_raw_data(table, sql_reserved_words)
+      def get_data(table, encodings=nil, reserved_words=[])
+        result = get_raw_data(table, reserved_words)
         result = handle_encodings(result, encodings) if encodings
         result
       end
@@ -37,10 +37,10 @@ module DataResurrection
         data.each {|record| cls.create! record }
       end
 
-      def get_raw_data(table, sql_reserved_words)
+      def get_raw_data(table, reserved_words)
         result = table.map {|record|
           table.columns.map {|c|
-            { generated_field_name(c.name.downcase, sql_reserved_words) => record.send(c.name.downcase) } if record
+            { generated_field_name(c.name.downcase, reserved_words) => record.send(c.name.downcase) } if record
           }.
             compact.
             reduce({}) {|h, e| h.merge! e }

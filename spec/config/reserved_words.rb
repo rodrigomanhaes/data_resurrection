@@ -10,10 +10,10 @@ end
 
 def original_file
   File.expand_path(File.join(File.dirname(__FILE__),
-    '..', '..', 'lib', 'data_resurrection', 'sql_reserved_words'))
+    '..', '..', 'lib', 'data_resurrection', 'reserved_words'))
 end
 
 def save_file
-  File.expand_path(File.join(File.dirname(__FILE__), 'sql_words'))
+  File.expand_path(File.join(File.dirname(__FILE__), 'reserved_words'))
 end
 
