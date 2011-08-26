@@ -8,9 +8,10 @@ module DataResurrection
     module DBF
       def resurrect(origin_table, options)
         target_table_name, from, to = options[:target], options[:from], options[:to]
+        field_types = options[:field_types]
         table = ::DBF::Table.new(origin_table)
         data = get_data(table, {from: from, to: to}, reserved_words)
-        create_table(table, target_table_name, data)
+        create_table(table, target_table_name, data, field_types)
         copy_data(target_table_name, data)
       end
 
@@ -22,13 +23,23 @@ module DataResurrection
 
       private
 
-      def create_table(table, table_name, data)
+      def create_table(table, table_name, data, field_types)
         schema = table.schema
         data.first.keys.each do |field|
           if !schema.include?('column "%s"' % field)
             schema['column "%s"' % field.chop] = 'column "%s"' % field
           end
         end
+
+        (field_types || []).each do |field, new_type|
+          schema =~ /column "#{field}", :(.+)/
+          tail = $1.split(':')
+          old_type = tail.shift
+          tail = tail.empty? ? "" : ":#{tail.join(':')}"
+          schema['column "%s", :%s%s' % [field, old_type, tail]] =
+            'column "%s", :%s%s' % [field, new_type, tail]
+        end
+
         eval(schema)
       end
 

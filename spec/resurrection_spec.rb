@@ -104,6 +104,16 @@ describe 'DBF data resurrection' do
     end
   end
 
+  it 'allows definition of different types for fields' do
+    @data_resurrection.resurrect(@dbf_file_path, :target => 'nationality',
+      :from => ['WINDOWS-1252', 'CP850'], :to => 'UTF-8',
+      :field_types => {:nr => :string })
+    Nationality = Class.new(ActiveRecord::Base) { self.table_name = 'nationality' }
+    [30, 36, 38].map {|cd_nac|
+      Nationality.find_by_cd_nac(cd_nac).nr
+    }.should == %w(3 4 6)
+  end
+
   context 'handles SQL reserved words appending an underscore' do
     before(:all) { change_reserved_words "NR\nANYTHING" }
     after(:all) { restore_reserved_words }
