@@ -4,3 +4,5 @@ Dir.glob(File.expand_path(File.join(File.dirname(__FILE__), 'config', '*.rb'))).
   require f
 end
 
+ActiveRecord::Migration.verbose = false
+

@@ -74,7 +74,6 @@ describe 'DBF data resurrection' do
 
   context 'feeding target table' do
     before(:each) do
-      ActiveRecord::Migration.verbose = false
       @data_resurrection.resurrect(@dbf_file_path, :target => 'nationality',
         :from => ['WINDOWS-1252', 'CP850'], :to => 'UTF-8')
     end
