@@ -24,22 +24,8 @@ module DataResurrection
       private
 
       def create_table(table, table_name, data, field_types)
-        schema = table.schema
-        data.first.keys.each do |field|
-          if !schema.include?('column "%s"' % field)
-            schema['column "%s"' % field.chop] = 'column "%s"' % field
-          end
-        end
-
-        (field_types || []).each do |field, new_type|
-          schema =~ /column "#{field}", :(.+)/
-          tail = $1.split(':')
-          old_type = tail.shift
-          tail = tail.empty? ? "" : ":#{tail.join(':')}"
-          schema['column "%s", :%s%s' % [field, old_type, tail]] =
-            'column "%s", :%s%s' % [field, new_type, tail]
-        end
-
+        schema = mark_name_clashed_fields(table.schema, data)
+        schema = replace_types(schema, field_types) if field_types
         eval(schema)
       end
 
@@ -82,6 +68,27 @@ module DataResurrection
             end
           end
         end
+      end
+
+      def mark_name_clashed_fields(schema, data)
+        data.first.keys.each do |field|
+          if !schema.include?('column "%s"' % field)
+            schema['column "%s"' % field.chop] = 'column "%s"' % field
+          end
+        end
+        schema
+      end
+
+      def replace_types(schema, field_types)
+        field_types.each do |field, new_type|
+          schema =~ /column "#{field}", :(.+)/
+          tail = $1.split(':')
+          old_type = tail.shift
+          tail = tail.empty? ? "" : ":#{tail.join(':')}"
+          schema['column "%s", :%s%s' % [field, old_type, tail]] =
+            'column "%s", :%s%s' % [field, new_type, tail]
+        end
+        schema
       end
 
       def all_valid?(string)
