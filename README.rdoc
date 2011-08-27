@@ -17,7 +17,11 @@ The hash parameter to constructor should be the your database settings for Activ
 The method "resurrect" accepts ":target", ":from" and ":to" as options. Target is the name of the table to be created in the pointed database, and :from and :to (both optional) forces a encoding conversion for all fields. Parameter :from may be a list in case of multiple encodings for the same table (yes, this kind of freaky thing really exists).
 
 
+== But gem dbf does this work!
+
+Data resurrection heavily uses this amazing gem internally, but currently it doesn't support encoding conversion, type conversion and does not handles fields whose name equals to SQL reserved words and Ruby methods.
+
 == Risk disclaimer
 
-This project is at a very early stage. Database migrations are a very critical issue. Anything you do with this software is at your own risk.
+This project was built for my own use, and it works for me. Remember that database migrations are a very critical issue. Anything you do with this software is at your own risk.
 
