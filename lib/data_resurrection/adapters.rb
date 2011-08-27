@@ -104,7 +104,7 @@ module DataResurrection
 
       REGULAR_LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
       DIGITS = '1234567890'
-      ACCENTED_LETTERS = 'ÀàÁÉÍÓÚáéíóúÂÊÔâêôÃÑÕãñõÖÜöü'
+      ACCENTED_LETTERS = 'ÀàÁÉÍÓÚáéíìóúÂÊÔâêôÃÑÕãñõÖÜöüÇç'
       SYMBOLS = "\"'!@#$\%&*()-_+=`{}[]^~,<>.:;/?|\\ "
       VALID_CHARS = [REGULAR_LETTERS, DIGITS, ACCENTED_LETTERS, SYMBOLS].join
     end
