@@ -2,6 +2,14 @@
 
 Bring your data, buried in decrepit formats, back to life! Convert data from old formats to modern ones. Currently supports DBF.
 
+
+== How to install
+
+Just run:
+
+    $ gem install data_resurrection
+
+
 == How to use
 
 If you have a PostgreSQL database and a DBF file called 'decrepit.dbf', you must call:
