@@ -1,0 +1,8 @@
+0.1.0
+
+* for now, only supporting DBF files as origin
+* encoding conversion (supporting many encodings for the same table)
+* deleted records in DBF tables are ignored
+* handles name conflicts between field names and SQL reserved words/core Ruby methods
+* allows definition of a different type for a field when creating the target table
+
