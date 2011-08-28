@@ -16,10 +16,20 @@ The hash parameter to constructor should be the your database settings for Activ
 
 The method "resurrect" accepts ":target", ":from" and ":to" as options. Target is the name of the table to be created in the pointed database, and :from and :to (both optional) forces a encoding conversion for all fields. Parameter :from may be a list in case of multiple encodings for the same table (yes, this kind of freaky thing really exists).
 
+In some cases, field types in original tables are not compatible with ones in the target table. By example, in a real case, a DBF table has an integer field containing a 12-digit value, what caused an overflow when trying to copy the value to an integer field on a PostGreSQL table. This can be handled with an additional option to the method "resurrect":
+
+    @data_resurrection.resurrect(@dbf_file_path, :target => 'nationality',
+      :from => ['WINDOWS-1252', 'CP850'], :to => 'UTF-8',
+      :field_types => {:nr => :string })
+
+The option :field_types is a hash in which each key is the field name and the value is the field type in the target table.
+
+If a field name equals to SQL reserved words or core Ruby methods like "class", the field name are appended with an underscore in the new table.
+
 
 == But gem dbf does this work!
 
-Data resurrection heavily uses this amazing gem internally, but currently it doesn't support encoding conversion, type conversion and does not handles fields whose name equals to SQL reserved words and Ruby methods.
+Data resurrection heavily uses this amazing gem internally, but currently it doesn't support encoding conversion, field type conversion and does not handle fields whose name equals to SQL reserved words and Ruby methods.
 
 == Risk disclaimer
 
