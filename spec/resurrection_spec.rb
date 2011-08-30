@@ -113,6 +113,14 @@ describe 'DBF data resurrection' do
     }.should == %w(3 4 6)
   end
 
+  it 'encoding options are optional' do
+    expect {
+      @data_resurrection.resurrect(@dbf_file_path, :target => 'nationality')
+    }.to_not raise_error
+    SAMPLE_FIELDS.map {|h| [h['cd_nac'], h['nr']] }.
+      should == Nationality.all.map {|f| [f.cd_nac, f.nr] }
+  end
+
   context 'handles SQL reserved words appending an underscore' do
     before(:all) { change_reserved_words "NR\nANYTHING" }
     after(:all) { restore_reserved_words }

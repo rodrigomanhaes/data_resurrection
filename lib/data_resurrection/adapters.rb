@@ -10,14 +10,15 @@ module DataResurrection
         target_table_name, from, to = options[:target], options[:from], options[:to]
         field_types = options[:field_types]
         table = ::DBF::Table.new(origin_table)
-        data = get_data(table, {from: from, to: to}, reserved_words)
+        encodings = from.present? ? {from: from, to: to} : nil
+        data = get_data(table, encodings, reserved_words)
         create_table(table, target_table_name, data, field_types)
         copy_data(target_table_name, data)
       end
 
       def get_data(table, encodings=nil, reserved_words=[])
         result = get_raw_data(table, reserved_words)
-        result = handle_encodings(result, encodings) if encodings
+        result = handle_encodings(result, encodings) if encodings.present?
         result
       end
 
