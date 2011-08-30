@@ -6,7 +6,9 @@ require 'dbf'
 
 describe 'DBF data resurrection' do
   before :all do
-    @dbf_file_path = File.expand_path(File.join(File.dirname(__FILE__), 'resources', 'nationality.dbf'))
+    resources_folder = File.expand_path(File.join(File.dirname(__FILE__), 'resources'))
+    @empty_dbf_file_path = File.join(resources_folder, 'empty_table.dbf')
+    @dbf_file_path = File.join(resources_folder, 'nationality.dbf')
     @dbf_table = ::DBF::Table.new(@dbf_file_path)
   end
 
@@ -100,6 +102,13 @@ describe 'DBF data resurrection' do
       obj = Nationality.find_by_nr(6)
       obj.nr.should be_a_kind_of Integer
       obj.cd_nac.should be_a_kind_of Integer
+    end
+
+    context 'when origin table is empty' do
+      it 'creates table anyway' do
+        @data_resurrection.resurrect(@empty_dbf_file_path, :target => 'empty_table')
+        Class.new(ActiveRecord::Base) { self.table_name = 'empty_table' }.count.should be_zero
+      end
     end
   end
 

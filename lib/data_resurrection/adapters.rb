@@ -25,7 +25,8 @@ module DataResurrection
       private
 
       def create_table(table, table_name, data, field_types)
-        schema = mark_name_clashed_fields(table.schema, data)
+        schema = mark_name_clashed_fields(table.schema,
+          table.columns.map {|c| generated_field_name(c.name.downcase, reserved_words) })
         schema = replace_types(schema, field_types) if field_types
         eval(schema)
       end
@@ -71,8 +72,8 @@ module DataResurrection
         end
       end
 
-      def mark_name_clashed_fields(schema, data)
-        data.first.keys.each do |field|
+      def mark_name_clashed_fields(schema, field_names)
+        field_names.each do |field|
           if !schema.include?('column "%s"' % field)
             schema['column "%s"' % field.chop] = 'column "%s"' % field
           end
