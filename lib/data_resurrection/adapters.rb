@@ -26,10 +26,11 @@ module DataResurrection
       private
 
       def create_table(table, table_name, data, field_types)
-        schema = mark_name_clashed_fields(table.schema,
+        schema = table.schema
+        mark_name_clashed_fields(schema,
           table.columns.map {|c| generated_field_name(c.name.downcase, reserved_words) })
-        schema = replace_table_name(schema, table_name)
-        schema = replace_types(schema, field_types) if field_types
+        replace_table_name(schema, table_name)
+        replace_types(schema, field_types) if field_types
         eval(schema)
       end
 
@@ -80,14 +81,12 @@ module DataResurrection
             schema['column "%s"' % field.chop] = 'column "%s"' % field
           end
         end
-        schema
       end
 
       def replace_table_name(schema, new_table_name)
         schema =~ /create_table "(.+)"/
         old_table_name = $1
         schema['create_table "%s"' % old_table_name] = 'create_table "%s"' % new_table_name
-        schema
       end
 
       def replace_types(schema, field_types)
@@ -99,7 +98,6 @@ module DataResurrection
           schema['column "%s", :%s%s' % [field, old_type, tail]] =
             'column "%s", :%s%s' % [field, new_type, tail]
         end
-        schema
       end
 
       def all_valid?(string)
