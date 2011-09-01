@@ -8,6 +8,7 @@ describe 'DBF data resurrection' do
   before :all do
     resources_folder = File.expand_path(File.join(File.dirname(__FILE__), 'resources'))
     @empty_dbf_file_path = File.join(resources_folder, 'empty_table.dbf')
+    @empty_field_file_path = File.join(resources_folder, 'empty_field.dbf')
     @dbf_file_path = File.join(resources_folder, 'nationality.dbf')
     @dbf_table = ::DBF::Table.new(@dbf_file_path)
   end
@@ -113,6 +114,14 @@ describe 'DBF data resurrection' do
       it 'creates table anyway' do
         @data_resurrection.resurrect(@empty_dbf_file_path, :target => 'empty_table')
         Class.new(ActiveRecord::Base) { self.table_name = 'empty_table' }.count.should be_zero
+      end
+    end
+
+    context 'when a field is empty' do
+      it 'retrieves an empty content' do
+        @data_resurrection.resurrect(@empty_field_file_path, :target => 'empty')
+        record = Class.new(ActiveRecord::Base) { self.table_name = 'empty' }.first
+        record.a_field.should be_empty
       end
     end
   end
