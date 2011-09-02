@@ -1,3 +1,9 @@
+0.1.2
+
+* generated table has no ActiveRecord id field
+* bugfix: requires active_record
+
+
 0.1.1
 
 * bugfix: encoding options was "optional" but omitting them raised a TypeError
