@@ -110,6 +110,12 @@ describe 'DBF data resurrection' do
       Class.new(ActiveRecord::Base) { self.table_name = 'nationality2' }.count.should == 3
     end
 
+    it 'does not add an id' do
+      @data_resurrection.resurrect(@dbf_file_path, :target => 'without_id')
+      obj = Class.new(ActiveRecord::Base) { self.table_name = 'without_id' }.first
+      obj.id.should be_nil
+    end
+
     context 'when origin table is empty' do
       it 'creates table anyway' do
         @data_resurrection.resurrect(@empty_dbf_file_path, :target => 'empty_table')

@@ -31,6 +31,7 @@ module DataResurrection
           table.columns.map {|c| generated_field_name(c.name.downcase, reserved_words) })
         replace_table_name(schema, table_name)
         replace_types(schema, field_types) if field_types
+        no_id(schema)
         eval(schema)
       end
 
@@ -98,6 +99,13 @@ module DataResurrection
           schema['column "%s", :%s%s' % [field, old_type, tail]] =
             'column "%s", :%s%s' % [field, new_type, tail]
         end
+      end
+
+      def no_id(schema)
+        schema =~ /create_table "(.+)"/
+        table_name = $1
+        schema['create_table "%s"' % table_name] =
+          'create_table "%s", :id => false' % table_name
       end
 
       def all_valid?(string)
