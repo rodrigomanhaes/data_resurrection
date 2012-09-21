@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.require_paths = ['lib']
 
   s.files = Dir.glob('lib/**/*.rb') + %w(README.rdoc LICENSE.txt lib/data_resurrection/reserved_words)
-  s.add_dependency('activerecord', '~> 3.0.0')
+  s.add_dependency('activerecord', '~> 3.2.0')
   s.add_dependency('dbf', '~> 1.6.0')
   s.add_development_dependency('sqlite3', '~> 1.3.0')
   s.add_development_dependency('rspec', '~> 2.11.0')

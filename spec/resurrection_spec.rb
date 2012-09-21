@@ -10,6 +10,8 @@ describe 'DBF data resurrection' do
     @empty_dbf_file_path = File.join(resources_folder, 'empty_table.dbf')
     @empty_field_file_path = File.join(resources_folder, 'empty_field.dbf')
     @dbf_file_path = File.join(resources_folder, 'nationality.dbf')
+    @dbf_ascii_only_path = File.join(resources_folder,
+      'nationality-ascii-only.dbf')
     @dbf_table = ::DBF::Table.new(@dbf_file_path)
   end
 
@@ -106,12 +108,14 @@ describe 'DBF data resurrection' do
     end
 
     it 'creates table with target name' do
-      @data_resurrection.resurrect(@dbf_file_path, :target => 'nationality2')
+      @data_resurrection.resurrect(@dbf_file_path, :target => 'nationality2',
+        :from => 'WINDOWS-1252', :to => 'UTF-8')
       Class.new(ActiveRecord::Base) { self.table_name = 'nationality2' }.count.should == 3
     end
 
     it 'does not add an id' do
-      @data_resurrection.resurrect(@dbf_file_path, :target => 'without_id')
+      @data_resurrection.resurrect(@dbf_file_path, :target => 'without_id',
+        :from => 'WINDOWS-1252', :to => 'UTF-8')
       obj = Class.new(ActiveRecord::Base) { self.table_name = 'without_id' }.first
       obj.id.should be_nil
     end
@@ -144,10 +148,10 @@ describe 'DBF data resurrection' do
 
   it 'encoding options are optional' do
     expect {
-      @data_resurrection.resurrect(@dbf_file_path, :target => 'nationality')
+      @data_resurrection.resurrect(@dbf_ascii_only_path, :target => 'nationality')
     }.to_not raise_error
-    SAMPLE_FIELDS.map {|h| [h['cd_nac'], h['nr']] }.
-      should == Nationality.all.map {|f| [f.cd_nac, f.nr] }
+    f = Nationality.all.first
+    ASCII_ONLY_FIELDS.values_at('cd_nac', 'nr').should == [f.cd_nac, f.nr]
   end
 
   context 'handles SQL reserved words appending an underscore' do
@@ -196,3 +200,4 @@ SAMPLE_FIELDS = [
   }
 ]
 
+ASCII_ONLY_FIELDS = SAMPLE_FIELDS[0]
