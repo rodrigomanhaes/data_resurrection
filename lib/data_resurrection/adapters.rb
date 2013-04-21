@@ -116,6 +116,11 @@ module DataResurrection
         reserved_words.include?(field_name.upcase) ? "#{field_name}_" : field_name
       end
 
+      def reserved_words
+        @reserved_words ||= File.read(File.expand_path(File.join(File.dirname(__FILE__), 'reserved_words'))).
+          each_line.map(&:chomp)
+    end
+
       class ARObject < ActiveRecord::Base
       end
 
