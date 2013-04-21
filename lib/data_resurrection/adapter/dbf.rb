@@ -4,7 +4,7 @@ require 'dbf'
 require 'iconv'
 
 module DataResurrection
-  module Adapters
+  module Adapter
     module DBF
       def resurrect(origin_table, options)
         target_table_name = options[:target]
@@ -117,7 +117,7 @@ module DataResurrection
       end
 
       def reserved_words
-        @reserved_words ||= File.read(File.expand_path(File.join(File.dirname(__FILE__), 'reserved_words'))).
+        @reserved_words ||= File.read(File.expand_path(File.join(File.dirname(__FILE__), 'dbf_reserved_words'))).
           each_line.map(&:chomp)
     end
 
@@ -132,4 +132,3 @@ module DataResurrection
     end
   end
 end
-

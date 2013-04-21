@@ -9,7 +9,7 @@ module DataResurrection
     private
 
     def find_adapter(adapter_key)
-      adapter = DataResurrection::Adapters
+      adapter = DataResurrection::Adapter
       adapter.const_get(adapter.constants.
         select {|const_name| adapter.const_get(const_name).is_a? Module }.
         find {|a| a.to_s.underscore.to_sym == adapter_key })

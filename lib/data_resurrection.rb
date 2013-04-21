@@ -1,4 +1,7 @@
 require 'active_record'
-data_resurrection_folder = File.join(File.dirname(__FILE__), 'data_resurrection', '*.rb')
-Dir.glob(data_resurrection_folder).each {|f| require f }
+
+module DataResurrection
+  autoload :Resuscitator, 'data_resurrection/resuscitator'
+  autoload :Adapter, 'data_resurrection/adapter'
+end
 

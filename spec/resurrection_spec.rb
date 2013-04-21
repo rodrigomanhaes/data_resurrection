@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'logger'
 require 'dbf'
+require 'iconv'
 
 describe 'DBF data resurrection' do
   before :all do

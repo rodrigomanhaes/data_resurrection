@@ -10,10 +10,10 @@ end
 
 def original_file
   File.expand_path(File.join(File.dirname(__FILE__),
-    '..', '..', 'lib', 'data_resurrection', 'reserved_words'))
+    *%w(.. .. lib data_resurrection adapter dbf_reserved_words)))
 end
 
 def save_file
-  File.expand_path(File.join(File.dirname(__FILE__), 'reserved_words'))
+  File.expand_path(File.join(File.dirname(__FILE__), 'dbf_reserved_words'))
 end
 
