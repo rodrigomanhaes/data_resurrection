@@ -12,14 +12,15 @@ module DataResurrection
         field_types = options[:field_types]
         table = ::DBF::Table.new(origin_table)
         encodings = from.present? ? {from: from, to: to} : nil
-        data = get_data(table, encodings, reserved_words)
+        data = get_data(table, encodings, reserved_words, options[:replacement])
         create_table(table, target_table_name, data, field_types)
         copy_data(target_table_name, data)
       end
 
-      def get_data(table, encodings=nil, reserved_words=[])
+      def get_data(table, encodings=nil, reserved_words=[], replacement = {})
         result = get_raw_data(table, reserved_words)
         result = handle_encodings(result, encodings) if encodings.present?
+        result = apply_replacements(result, replacement) if replacement
         result
       end
 
@@ -71,6 +72,18 @@ module DataResurrection
                 end
               end
               record[k] = value
+            end
+          end
+        end
+      end
+
+      def apply_replacements(data, replacements)
+        data.each do |record|
+          record.each do |k, v|
+            replacements.each do |source, target|
+              if v.kind_of? String
+                record[k] = v.gsub(source, target) if v.include?(source)
+              end
             end
           end
         end

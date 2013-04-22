@@ -76,6 +76,13 @@ describe 'DBF data resurrection' do
       result = @data_resurrection.get_data(@dbf_table, :from => 'WINDOWS-1252', :to => 'UTF-8')
       (0..2).each {|n| result[n]['nr'].should == SAMPLE_FIELDS[n]['nr'] }
     end
+
+    it 'applies arbitrary character replacement when required' do
+      result = @data_resurrection.get_data(@dbf_table, { from: 'WINDOWS-1252', to: 'UTF-8' },
+        [], '€' => 'Ñ', 'É' => 'Ò')
+      result[1]['ds'].should == 'ESTADOS UNIDOS DA AMÒRICA'
+      result[2]['ad_patr'].should == 'MOÑAMBICANO'
+    end
   end
 
   context 'feeding target table' do
