@@ -28,11 +28,16 @@ In some cases, field types in original tables are not compatible with ones in th
 
     @data_resurrection.resurrect(@dbf_file_path, :target => 'nationality',
       :from => ['WINDOWS-1252', 'CP850'], :to => 'UTF-8',
-      :field_types => {:nr => :string })
+      :field_types => {:nr => :string },
+      :replacement => { '╟' => 'Ã' })
 
 The option :field_types is a hash in which each key is the field name and the value is the field type in the target table.
 
-If a field name equals to SQL reserved words or core Ruby methods like "class", the field name are appended with an underscore in the new table.
+The option :replacement allows defining arbitrary character replacement, *after*
+running all encodings. In the example, all existing weird "╟" in all strings
+will be replaced by "Ã".
+
+If a field name equals to SQL reserved words or core Ruby methods like "class", the field name is appended with an underscore in the new table.
 
 
 == But gem dbf does this work!
