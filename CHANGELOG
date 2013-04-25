@@ -1,3 +1,7 @@
+0.2.0
+
+* allows specification of arbitrary character replacing
+
 0.1.2
 
 * generated table has no ActiveRecord id field
